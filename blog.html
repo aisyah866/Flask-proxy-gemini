@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>AI Chat - Mhmd Imron</title>
+    <style>
+      body { font-family: Arial; margin: 20px; }
+      #chat-log { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; background: #f9f9f9; }
+      .user { color: blue; }
+      .ai { color: green; margin-left: 10px; }
+    </style>
+  </head>
+  <body>
+    <h2>AI Chat by Mhmd Imron</h2>
+    <div id="chat-log"></div>
+    <input id="prompt" placeholder="Tulis pertanyaan..." style="width:70%">
+    <button id="send">Kirim</button>
+
+    <script>
+      const chatLog = document.getElementById("chat-log");
+      const promptInput = document.getElementById("prompt");
+      const sendBtn = document.getElementById("send");
+
+      // GANTI dengan URL proxy Anda (Render / ngrok / domain Anda)
+      const PROXY_URL = "https://REPLACE_WITH_YOUR_PROXY_URL/proxy-ai";
+
+      async function kirim() {
+        const prompt = promptInput.value.trim();
+        if (!prompt) return;
+        const divUser = document.createElement("div");
+        divUser.className = "user";
+        divUser.textContent = "Kamu: " + prompt;
+        chatLog.appendChild(divUser);
+        chatLog.scrollTop = chatLog.scrollHeight;
+
+        try {
+          const res = await fetch(PROXY_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt })
+          });
+          const data = await res.json();
+          const divAI = document.createElement("div");
+          divAI.className = "ai";
+          divAI.textContent = "AI: " + (data.result || JSON.stringify(data));
+          chatLog.appendChild(divAI);
+        } catch (err) {
+          const divErr = document.createElement("div");
+          divErr.className = "ai";
+          divErr.textContent = "Error: " + err.message;
+          chatLog.appendChild(divErr);
+        }
+
+        promptInput.value = "";
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+
+      sendBtn.addEventListener("click", kirim);
+      promptInput.addEventListener("keypress", e => { if (e.key === "Enter") kirim(); });
+    </script>
+  </body>
+</html>
